@@ -2,7 +2,7 @@
 
 This project is part of my web development learning alongside The Odin Project.
 
-You can find the related exercise [here](https://www.theodinproject.com/lessons/ruby-caesar-cipher)
+You can find the related exercise [here](https://www.theodinproject.com/lessons/ruby-tic-tac-toe)
 
 ## Assignment
 
