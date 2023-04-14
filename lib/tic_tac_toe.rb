@@ -26,7 +26,7 @@ module TicTacToe
       column = position[1].to_i - 1
       raise StandardError, 'This is not a valid column, you can chose from "1" to "3".' unless (0..2).include?(column)
 
-      raise StandardError, "Position '#{position}' is already used, please chose another." unless row[column] == ' '
+      raise StandardError, "Position '#{position}' is already used, chose another." unless @grid[row][column] == ' '
 
       @grid[row][column] = symbol
     end
@@ -46,7 +46,7 @@ module TicTacToe
 
     # return a row corresponding to the input position (a, b or c)
     def position_to_row(position)
-      case position[0].lower
+      case position[0].downcase
       when 'a'
         0
       when 'b'
@@ -82,6 +82,49 @@ module TicTacToe
       @current_player = [true, false].sample ? @player1 : @player2
     end
 
+    def play
+      newgame_presentation
+      until @board.full?
+        play_turn
+        break gz_winner(@current_player) if @board.win?(@current_player.symbol)
+
+        @current_player = @current_player == @player1 ? @player2 : @player1
+      end
+    end
+
+    private
+
+    def initialize_players
+      puts 'Enter player 1 name : '
+      @player1 = Player.new(gets.chomp)
+      until %w[X O].include?(@player1.symbol)
+        puts 'Chose your symbol (X/O) : '
+        @player1.symbol = gets.chomp
+      end
+      puts 'Enter player 2 name : '
+      @player2 = Player.new(gets.chomp)
+      @player2.symbol = @player1.symbol == 'X' ? 'O' : 'X'
+    end
+
+    def play_turn(current_player = @current_player)
+      puts "#{current_player.name} it is your turn to play, chose an emplacement (A1 to C3)"
+      position = gets.chomp
+      while true
+        begin
+          @board.add_symbol(position, current_player.symbol)
+        rescue StandardError => e
+          puts e.message
+          puts "Please choose a different position (A1 to C3)"
+          position = gets.chomp
+        else
+          puts
+          @board.display
+          puts
+          break
+        end
+      end
+    end
+
     def players_details
       puts "Player 1 name : #{@player1.name}"
       puts "Player 1 symbol : #{@player1.symbol}"
@@ -101,44 +144,8 @@ module TicTacToe
       puts
     end
 
-    def play
-      newgame_presentation
-      until @board.full? # || win?
-        play_turn
-        @current_player == @player1 ? @player2 : @player1
-      end
-    end
-
-    def play_turn(current_player = @current_player)
-      puts "#{current_player.name} it is your turn to play, chose an emplacement (A1 to C3)"
-      position = gets.chomp
-      while true
-        begin
-          add_symbol(position, current_player.symbol)
-        rescue StandardError
-          puts "#{position} is not a valid emplacement."
-          puts "Please choose a different position (A1 to C3)"
-          position = gets.chomp
-        else
-          puts
-          @board.display
-          puts
-        end
-      end
-    end
-
-    private
-
-    def initialize_players
-      puts 'Enter player 1 name : '
-      @player1 = Player.new(gets.chomp)
-      until %w[X O].include?(@player1.symbol)
-        puts 'Chose your symbol (X/O) : '
-        @player1.symbol = gets.chomp
-      end
-      puts 'Enter player 2 name : '
-      @player2 = Player.new(gets.chomp)
-      @player2.symbol = @player1.symbol == 'X' ? 'O' : 'X'
+    def gz_winner(player = @current_player)
+      puts "Congratulation #{player}, you won this game !"
     end
   end
 end
