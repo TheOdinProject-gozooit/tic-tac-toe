@@ -10,17 +10,22 @@ module TicTacToe
 
   class Board
     def initialize
-      @first_row = [' ', ' ', ' ']
-      @second_row = [' ', ' ', ' ']
-      @third_row = [' ', ' ', ' ']
+      # @first_row = [' ', ' ', ' ']
+      # @second_row = [' ', ' ', ' ']
+      # @third_row = [' ', ' ', ' ']
+      @grid = Array.new(3) { Array.new(3, ' ') }
     end
 
     def display
-      puts @first_row.join(' | ')
-      puts '---------'
-      puts @second_row.join(' | ')
-      puts '---------'
-      puts @third_row.join(' | ')
+      @grid.each_with_index do |row, index|
+        puts '---------' unless index.zero?
+        puts row.join(' | ')
+      end
+      # puts @first_row.join(' | ')
+      # puts '---------'
+      # puts @second_row.join(' | ')
+      # puts '---------'
+      # puts @third_row.join(' | ')
     end
 
     # add a symbol to the board
@@ -31,27 +36,43 @@ module TicTacToe
 
       raise StandardError, "Position '#{position}' is already used, please chose another." unless row[column] == ' '
 
-      row[column] = symbol
+      @grid[row][column] = symbol
     end
 
     def full?
-      [@first_row, @second_row, @third_row].each do |row|
+      @grid.each do |row|
         return false if row.any?(' ')
       end
       true
+    end
+
+    def win_row?(symbol)
+      @grid.any? { |row| row.all?(symbol) }
+    end
+
+    def win_column?(symbol)
+      transposed_grid = @grid.transpose
+      transposed_grid.any? { |row| row.all?(symbol) }
+    end
+
+    def win_diagonal?(symbol)
+      diagonal1 = (0..2).collect { |i| @grid[i][i] }
+      diagonal2 = (0..2).collect { |i| @grid[i][2 - i] }
+
+      [diagonal1, diagonal2].any? { |diag| diag.all?(symbol) }
     end
 
     private
 
     # return a row corresponding to the input position (a, b or c)
     def position_to_row(position)
-      case position[0]
+      case position[0].lower
       when 'a'
-        @first_row
+        0
       when 'b'
-        @second_row
+        1
       when 'c'
-        @third_row
+        2
       else
         raise StandardError, 'This is not a valid row, you can chose from "a" to "c".'
       end
