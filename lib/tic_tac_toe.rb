@@ -1,7 +1,10 @@
 module TicTacToe
   class Player
+    attr_accessor :name, :symbol
+
     def initialize(name)
       @name = name
+      @symbol = nil
     end
   end
 
@@ -50,7 +53,42 @@ module TicTacToe
 
   class Game
     def initialize
+      initialize_players
+      @board = Board.new
+    end
 
+    # def initialize_players_symbols
+    #   symbols = %w[X O]
+    #   @player1.symbol = symbols.delete_at(rand(2))
+    #   @player2.symbol = symbols.join
+    #   puts "#{@player1.name} is playing '#{@player1.symbol}'."
+    #   puts "#{@player2.name} is playing '#{@player2.symbol}'."
+    # end
+
+    # def switch_players_symbols
+    #   tmp = @player1.symbol
+    #   @player1.symbol = @player2.symbol
+    #   @player2.symbol = tmp
+    #   puts "#{@player1.name} is playing '#{@player1.symbol}'."
+    #   puts "#{@player2.name} is playing '#{@player2.symbol}'."
+    # end
+
+    def play_turn
+
+    end
+
+    private
+
+    def initialize_players
+      puts 'Enter player 1 name : '
+      @player1 = Player.new(gets.chomp)
+      until %w[X O].include?(@player1.symbol)
+        puts 'Chose your symbol (X/O) : '
+        @player1.symbol = gets.chomp
+      end
+      puts 'Enter player 2 name : '
+      @player2 = Player.new(gets.chomp)
+      @player2.symbol = @player1.symbol == 'X' ? 'O' : 'X'
     end
   end
 end
