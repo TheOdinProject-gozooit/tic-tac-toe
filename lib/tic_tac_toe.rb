@@ -10,9 +10,6 @@ module TicTacToe
 
   class Board
     def initialize
-      # @first_row = [' ', ' ', ' ']
-      # @second_row = [' ', ' ', ' ']
-      # @third_row = [' ', ' ', ' ']
       @grid = Array.new(3) { Array.new(3, ' ') }
     end
 
@@ -21,11 +18,6 @@ module TicTacToe
         puts '---------' unless index.zero?
         puts row.join(' | ')
       end
-      # puts @first_row.join(' | ')
-      # puts '---------'
-      # puts @second_row.join(' | ')
-      # puts '---------'
-      # puts @third_row.join(' | ')
     end
 
     # add a symbol to the board
@@ -46,20 +38,8 @@ module TicTacToe
       true
     end
 
-    def win_row?(symbol)
-      @grid.any? { |row| row.all?(symbol) }
-    end
-
-    def win_column?(symbol)
-      transposed_grid = @grid.transpose
-      transposed_grid.any? { |row| row.all?(symbol) }
-    end
-
-    def win_diagonal?(symbol)
-      diagonal1 = (0..2).collect { |i| @grid[i][i] }
-      diagonal2 = (0..2).collect { |i| @grid[i][2 - i] }
-
-      [diagonal1, diagonal2].any? { |diag| diag.all?(symbol) }
+    def win?(symbol)
+      win_row?(symbol) || win_column?(symbol) || win_diagonal?(symbol)
     end
 
     private
@@ -76,6 +56,22 @@ module TicTacToe
       else
         raise StandardError, 'This is not a valid row, you can chose from "a" to "c".'
       end
+    end
+
+    def win_row?(symbol)
+      @grid.any? { |row| row.all?(symbol) }
+    end
+
+    def win_column?(symbol)
+      transposed_grid = @grid.transpose
+      transposed_grid.any? { |row| row.all?(symbol) }
+    end
+
+    def win_diagonal?(symbol)
+      diagonal1 = (0..2).collect { |i| @grid[i][i] }
+      diagonal2 = (0..2).collect { |i| @grid[i][2 - i] }
+
+      [diagonal1, diagonal2].any? { |diag| diag.all?(symbol) }
     end
   end
 
