@@ -1,10 +1,19 @@
 module TicTacToe
   class Player
-    attr_accessor :name, :symbol
+    attr_accessor :name, :symbol, :win, :lose, :draw
 
     def initialize(name)
       @name = name
       @symbol = nil
+      @win = 0
+      @lose = 0
+      @draw = 0
+    end
+
+    def display_info
+      puts "Name : #{@name}"
+      puts "Symbol : #{@symbol}"
+      puts "#{@win}W/#{@lose}L/#{@draw}D"
     end
   end
 
@@ -24,7 +33,7 @@ module TicTacToe
     def add_symbol(position, symbol)
       row = position_to_row(position)
       column = position[1].to_i - 1
-      raise StandardError, 'This is not a valid column, you can chose from "1" to "3".' unless (0..2).include?(column)
+      raise StandardError, "'#{column + 1}' is not a valid column, you can chose from '1' to '3'." unless (0..2).include?(column)
 
       raise StandardError, "Position '#{position}' is already used, chose another." unless @grid[row][column] == ' '
 
@@ -84,22 +93,37 @@ module TicTacToe
 
     def play
       newgame_presentation
-      until @board.full?
+      loop do
+        break draw if @board.full?
+
         play_turn
-        break gz_winner(@current_player) if @board.win?(@current_player.symbol)
+        break win(@current_player) if @board.win?(@current_player.symbol)
 
         @current_player = @current_player == @player1 ? @player2 : @player1
       end
+      replay
     end
 
     private
+
+    def replay
+      puts 'Do you want to play again ? (Y/N)'
+      response = gets.chomp.upcase until %w[Y N].include?(response)
+      if response == 'Y'
+        @board = Board.new
+        @current_player = [true, false].sample ? @player1 : @player2
+        play
+      else
+        endgame_recap
+      end
+    end
 
     def initialize_players
       puts 'Enter player 1 name : '
       @player1 = Player.new(gets.chomp)
       until %w[X O].include?(@player1.symbol)
         puts 'Chose your symbol (X/O) : '
-        @player1.symbol = gets.chomp
+        @player1.symbol = gets.chomp.upcase
       end
       puts 'Enter player 2 name : '
       @player2 = Player.new(gets.chomp)
@@ -109,28 +133,26 @@ module TicTacToe
     def play_turn(current_player = @current_player)
       puts "#{current_player.name} it is your turn to play, chose an emplacement (A1 to C3)"
       position = gets.chomp
-      while true
-        begin
-          @board.add_symbol(position, current_player.symbol)
-        rescue StandardError => e
-          puts e.message
-          puts "Please choose a different position (A1 to C3)"
-          position = gets.chomp
-        else
-          puts
-          @board.display
-          puts
-          break
-        end
+      loop do
+        @board.add_symbol(position, current_player.symbol)
+      rescue StandardError => e
+        puts e.message
+        puts 'Please choose a different position (A1 to C3)'
+        position = gets.chomp
+      else
+        puts
+        @board.display
+        puts
+        break
       end
     end
 
     def players_details
-      puts "Player 1 name : #{@player1.name}"
-      puts "Player 1 symbol : #{@player1.symbol}"
+      puts 'Player 1 :'
+      @player1.display_info
       puts
-      puts "Player 2 name : #{@player2.name}"
-      puts "Player 2 symbol : #{@player2.symbol}"
+      puts 'Player 1 :'
+      @player1.display_info
     end
 
     def newgame_presentation
@@ -144,8 +166,31 @@ module TicTacToe
       puts
     end
 
-    def gz_winner(player = @current_player)
-      puts "Congratulation #{player}, you won this game !"
+    def endgame_recap
+      puts 'End of the game, thank you for playing ! Here is a recap :'
+      puts
+      players_details
+      puts
+      if @player1.win > @player2.win
+        puts "Gratz #{@player1.name}, you won most of the games."
+      elsif @player1.win < @player2.win
+        puts "Gratz #{@player2.name}, you won most of the games."
+      else
+        puts "Wow ! That's a perfect draw, gratz to both."
+      end
+    end
+
+    def win(winner = @current_player)
+      puts "Congratulation #{winner.name}, you won this game !"
+      looser = winner == @player1 ? @player2 : @player1
+      looser.lose += 1
+      winner.win += 1
+    end
+
+    def draw
+      @player1.draw += 1
+      @player2.draw += 1
+      puts "The board is full, it's a draw !"
     end
   end
 end
