@@ -10,6 +10,7 @@ module TicTacToe
       @draw = 0
     end
 
+    # Display player infos to the console
     def display_info
       puts "Name : #{@name}"
       puts "Symbol : #{@symbol}"
@@ -22,6 +23,7 @@ module TicTacToe
       @grid = Array.new(3) { Array.new(3, ' ') }
     end
 
+    # Display the grid to the console
     def display
       @grid.each_with_index do |row, index|
         puts '---------' unless index.zero?
@@ -40,6 +42,7 @@ module TicTacToe
       @grid[row][column] = symbol
     end
 
+    # return false if any emplacement is empty, otherwise return true (= board is full)
     def full?
       @grid.each do |row|
         return false if row.any?(' ')
@@ -47,13 +50,14 @@ module TicTacToe
       true
     end
 
+    # return true if any win is found (vertical, horizontal or diagonal), otherwise false
     def win?(symbol)
       win_row?(symbol) || win_column?(symbol) || win_diagonal?(symbol)
     end
 
     private
 
-    # return a row corresponding to the input position (a, b or c)
+    # return a row number (0, 1, 2) corresponding to the input position (a, b or c)
     def position_to_row(position)
       case position[0].downcase
       when 'a'
@@ -67,15 +71,18 @@ module TicTacToe
       end
     end
 
+    # return true if there is an horizontal win, otherwise return false
     def win_row?(symbol)
       @grid.any? { |row| row.all?(symbol) }
     end
 
+    # return true if there is a vertical win, otherwise return false
     def win_column?(symbol)
       transposed_grid = @grid.transpose
       transposed_grid.any? { |row| row.all?(symbol) }
     end
 
+    # return true if there is a diagonal win, otherwise return false
     def win_diagonal?(symbol)
       diagonal1 = (0..2).collect { |i| @grid[i][i] }
       diagonal2 = (0..2).collect { |i| @grid[i][2 - i] }
@@ -91,6 +98,7 @@ module TicTacToe
       @current_player = [true, false].sample ? @player1 : @player2
     end
 
+    # the main game loop
     def play
       newgame_presentation
       loop do
@@ -106,6 +114,7 @@ module TicTacToe
 
     private
 
+    # give possibility to player to chose if they want to play again or not
     def replay
       puts 'Do you want to play again ? (Y/N)'
       response = gets.chomp.upcase until %w[Y N].include?(response)
@@ -118,6 +127,7 @@ module TicTacToe
       end
     end
 
+    # initialize two players and set their symbols
     def initialize_players
       puts 'Enter player 1 name : '
       @player1 = Player.new(gets.chomp)
@@ -130,6 +140,7 @@ module TicTacToe
       @player2.symbol = @player1.symbol == 'X' ? 'O' : 'X'
     end
 
+    # current player chose an emplacement, place the symbol on the grid then display the grid
     def play_turn(current_player = @current_player)
       puts "#{current_player.name} it is your turn to play, chose an emplacement (A1 to C3)"
       position = gets.chomp
@@ -147,6 +158,7 @@ module TicTacToe
       end
     end
 
+    # display informations about each player
     def players_details
       puts 'Player 1 :'
       @player1.display_info
@@ -155,6 +167,7 @@ module TicTacToe
       @player1.display_info
     end
 
+    # display informations when a new game begins
     def newgame_presentation
       puts 'The Tic Tac Toe game begins !'
       puts
@@ -166,6 +179,7 @@ module TicTacToe
       puts
     end
 
+    # display informations when the game is over, such as scores and winner
     def endgame_recap
       puts 'End of the game, thank you for playing ! Here is a recap :'
       puts
@@ -180,6 +194,7 @@ module TicTacToe
       end
     end
 
+    # display gz message as well as incrementing win and lose score for both players
     def win(winner = @current_player)
       puts "Congratulation #{winner.name}, you won this game !"
       looser = winner == @player1 ? @player2 : @player1
@@ -187,6 +202,7 @@ module TicTacToe
       winner.win += 1
     end
 
+    # display draw message and increment draw score for each player
     def draw
       @player1.draw += 1
       @player2.draw += 1
