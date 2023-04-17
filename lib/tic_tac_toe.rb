@@ -163,8 +163,8 @@ module TicTacToe
       puts 'Player 1 :'
       @player1.display_info
       puts
-      puts 'Player 1 :'
-      @player1.display_info
+      puts 'Player 2 :'
+      @player2.display_info
     end
 
     # display informations when a new game begins
